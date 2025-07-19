@@ -7,6 +7,7 @@ import { collection, query, where, orderBy, onSnapshot } from "firebase/firestor
 import { GeminiResponse } from "@/types/gemini-response"
 import { ContentPreview } from "@/components/contentPreview"
 import { Card, CardContent } from "@/components/ui/card"
+import { ExportPDFButton } from "@/components/pdf/exportPdfButton"
 
 interface HistoryItem {
   id: string
@@ -28,7 +29,7 @@ export default function HistoryPage() {
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       console.log("passou aqui");
-      
+
       const data: HistoryItem[] = snapshot.docs.map(doc => ({
         id: doc.id,
         topic: doc.data().topic,
@@ -47,9 +48,17 @@ export default function HistoryPage() {
 
       {selectedItem ? (
         <div>
-          <button className="mb-4 text-blue-600 underline" onClick={() => setSelectedItem(null)}>
-            ← Voltar para o histórico
-          </button>
+          <div className="flex items-center justify-between mb-4">
+            <button
+              className="text-blue-600 underline"
+              onClick={() => setSelectedItem(null)}
+            >
+              ← Voltar para o histórico
+            </button>
+
+            {/* ✅ Botão de exportar PDF para o item selecionado */}
+            <ExportPDFButton topic={selectedItem.topic} data={selectedItem.result} />
+          </div>
           <h2 className="text-xl font-semibold mb-2">Tema: {selectedItem.topic}</h2>
           <ContentPreview data={selectedItem.result} />
         </div>

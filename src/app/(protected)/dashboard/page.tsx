@@ -7,6 +7,7 @@ import { ContentPreview } from "@/components/contentPreview"
 import { GeminiResponse } from "@/types/gemini-response"
 import { saveToHistory } from "@/lib/save-to-history"
 import { useAuth } from "@/hooks/useAuth"
+import { ExportPDFButton } from "@/components/pdf/exportPdfButton"
 
 export default function Dashboard() {
   const { user } = useAuth()
@@ -14,6 +15,7 @@ export default function Dashboard() {
 
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState<GeminiResponse | null>(null)
+  const [promptTopic, setPromptTopic] = useState("")
 
   async function handlePromptSubmit(prompt: string) {
     setLoading(true)
@@ -31,7 +33,8 @@ export default function Dashboard() {
 
       const response = await res.json()
       setData(response.result)
-
+      setPromptTopic(prompt)
+      
       if (userId) {
         await saveToHistory({
           userId,
@@ -53,7 +56,12 @@ export default function Dashboard() {
       <PromptExamples onSelect={handlePromptSubmit} />
       <PromptInput onSubmit={handlePromptSubmit} loading={loading} />
 
-      {data && <ContentPreview data={data} />}
+      {data && (
+        <>
+          <ContentPreview data={data} />
+          <ExportPDFButton topic={promptTopic} data={data} />
+        </>
+      )}
     </main>
   )
 }
